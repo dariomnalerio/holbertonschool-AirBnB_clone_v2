@@ -2,6 +2,8 @@
 """ Console Module """
 import cmd
 import sys
+import uuid
+from datetime import datetime
 from models.base_model import BaseModel
 from models.__init__ import storage
 from models.user import User
@@ -118,13 +120,37 @@ class HBNBCommand(cmd.Cmd):
         if not args:
             print("** class name missing **")
             return
-        elif args not in HBNBCommand.classes:
+        args_list = args.split()
+
+        if args_list[0] not in HBNBCommand.classes:
             print("** class doesn't exist **")
             return
-        new_instance = HBNBCommand.classes[args]()
+        
+        parameters = {}
+
+        for arg in args_list[1:]:
+            key, value = arg.split('=')
+            if key and value:
+                if value[0] == '"' and value[-1] == '"':
+                    value = value[1:-1]
+                    value = value.replace('_', ' ')
+                    value = value.strip("\\")
+            elif '.' in value:
+                value = float(value)
+            else:
+                value = int(value)
+            parameters[key] = value
+
+        time = datetime.now()
+
+        parameters["updated_at"] = time.isoformat()
+        parameters["created_at"] = time.isoformat()
+        parameters['__class__'] = args_list[0]
+        parameters["id"] = str(uuid.uuid4())
+
+        new_instance = HBNBCommand.classes[args_list[0]](**parameters)
         storage.save()
         print(new_instance.id)
-        storage.save()
 
     def help_create(self):
         """ Help information for the create method """
