@@ -10,6 +10,11 @@ from models.city import City
 from models.amenity import Amenity
 from models.review import Review
 
+classes = {
+            'BaseModel': BaseModel, 'User': User, 'Place': Place,
+            'State': State, 'City': City, 'Amenity': Amenity,
+            'Review': Review
+            }
 
 class DBStorage():
     """Class method"""
@@ -23,5 +28,5 @@ class DBStorage():
                                                 getenv('HBNB_MYSQL_HOST'),
                                                 getenv('HBNB_MYSQL_DB')),
                                         pool_pre_ping=True)
-        if ENV == 'test':
+        if getenv('HBNB_ENV') == 'test':
             Base.metadata.drop_all(self.__engine)
