@@ -213,7 +213,7 @@ class HBNBCommand(cmd.Cmd):
         key = c_name + "." + c_id
 
         try:
-            del(storage.all()[key])
+            del (storage.all()[key])
             storage.save()
         except KeyError:
             print("** no instance found **")
@@ -232,12 +232,13 @@ class HBNBCommand(cmd.Cmd):
             if args not in HBNBCommand.classes:
                 print("** class doesn't exist **")
                 return
-            for k, v in storage._FileStorage__objects.items():
-                if k.split('.')[0] == args:
-                    print_list.append(str(v))
+            print_list = list(map(lambda x: str(x),
+                              storage.all(args).values()))
+
         else:
-            for k, v in storage._FileStorage__objects.items():
-                print_list.append(str(v))
+            print_list = list(map(lambda x: str(x),
+                              storage.all().values()))
+
 
         print(print_list)
 
