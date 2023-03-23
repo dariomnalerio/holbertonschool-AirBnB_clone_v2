@@ -11,16 +11,18 @@ from models.city import City
 from models.amenity import Amenity
 from models.review import Review
 
-classes = {
-    'BaseModel': BaseModel, 'User': User, 'Place': Place,
-    'State': State, 'City': City, 'Amenity': Amenity,
-    'Review': Review
-}
+
 
 class DBStorage():
     """Class method"""
     __engine = None
     __session = None
+
+    classes = {
+    'BaseModel': BaseModel, 'User': User, 'Place': Place,
+    'State': State, 'City': City, 'Amenity': Amenity,
+    'Review': Review
+    }
 
     def __init__(self):
 
@@ -37,9 +39,9 @@ class DBStorage():
 
     def all(self, cls=None):
         objs = {}
-        for class_item in classes:
-            if classes[class_item] == cls or cls is None:
-                for key in self.__session.query(model[class_item]).all():
+        for class_item in self.classes:
+            if self.classes[class_item] == cls or cls is None:
+                for key in self.__session.query(self.classes[class_item]).all():
                     objs[f"{key.__class__.__name__}.{key.id}"] = key
         return objs
 
