@@ -42,3 +42,19 @@ class DBStorage():
                 for key in self.__session.query(model[class_item]).all():
                     objs[f"{key.__class__.__name__}.{key.id}"] = key
         return objs
+
+    def new(self, obj):
+        self.__session.add(obj)
+
+    def save(self):
+        self.__session.commit()
+
+    def delete(self, obj=None):
+        if obj is not None:
+            self.__session.delete(obj)
+
+    def reload(self):
+        Base.metadata.create_all(self.__engine)
+        Session = scoped_session(sessionmaker(
+            bind=self.__engine, expire_on_commit=False))
+        self.__session = Session()
