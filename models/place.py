@@ -5,12 +5,10 @@ from sqlalchemy import Column, String, Integer, ForeignKey, Float, Table
 from sqlalchemy.orm import relationship
 
 
-tables = Table(
+place_amenities = Table(
     "place_amenity", Base.metadata,
-    Column("place_id", String(60), ForeignKey("places.id"),
-    primary_key = True, nullable = False),
-    Column("amenity_id", String(60), ForeignKey("amenities.id"),
-    primary_key = True, nullable = False)
+    Column("place_id", String(60), ForeignKey("places.id"), nullable = False),
+    Column("amenity_id", String(60), ForeignKey("amenities.id"), nullable = False)
 )
 
 class Place(BaseModel, Base):
@@ -29,3 +27,13 @@ class Place(BaseModel, Base):
     amenity_ids = []
 
     reviews = relationship("Review", backref="place", cascade="delete")
+
+    @property
+    def reviews(self):
+        """ Return all reviews for a place """
+        return [Review.all(Review.place_id == self.id)]
+
+    @property
+    def amenities(self):
+        """ Return all amenities for a place """
+        return [Amenity.all(Amenity.id == self.id)]

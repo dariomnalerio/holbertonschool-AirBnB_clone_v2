@@ -120,36 +120,33 @@ class HBNBCommand(cmd.Cmd):
         if not args:
             print("** class name missing **")
             return
-        args_list = args.split()
 
-        if args_list[0] not in HBNBCommand.classes:
+        args_list = args.split()[1:]
+        class_name = args.split()[0]
+
+        if class_name not in HBNBCommand.classes:
             print("** class doesn't exist **")
             return
 
         parameters = {}
 
-        for arg in args_list[1:]:
-            key, value = arg.split('=')
-            if key and value:
-                if value[0] == '"' and value[-1] == '"':
-                    value = value[1:-1]
-                    value = value.replace('_', ' ')
-                    value = value.strip("\\")
-            elif '.' in value:
-                value = float(value)
+        new_instance = HBNBCommand.classes[class_name]()
+
+        for item in args_list:
+            arg_name, arg_value = item.split('=', maxsplit=1)
+
+            if "\"" in arg_value:
+                arg_value = arg_value.strip("\"")
+                if "_" in arg_value:
+                    arg_value = arg_value.replace("_", " ")
+            
+            elif '.' in arg_value:
+                arg_value = float(arg_value)
             else:
-                value = int(value)
-            parameters[key] = value
+                arg_value = int(arg_value)
+            setattr(new_instance, arg_name, arg_value)
 
-        time = datetime.now()
-
-        parameters["updated_at"] = time.isoformat()
-        parameters["created_at"] = time.isoformat()
-        parameters['__class__'] = args_list[0]
-        parameters["id"] = str(uuid.uuid4())
-
-        new_instance = HBNBCommand.classes[args_list[0]](**parameters)
-        storage.save()
+        new_instance.save()
         print(new_instance.id)
 
     def help_create(self):
