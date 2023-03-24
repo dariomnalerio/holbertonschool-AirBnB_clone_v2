@@ -19,7 +19,7 @@ class DBStorage():
     __session = None
 
     classes = {
-    'BaseModel': BaseModel, 'User': User, 'Place': Place,
+    'User': User, 'Place': Place,
     'State': State, 'City': City, 'Amenity': Amenity,
     'Review': Review
     }
@@ -38,12 +38,27 @@ class DBStorage():
             Base.metadata.drop_all(self.__engine)
 
     def all(self, cls=None):
-        objs = {}
-        for class_item in self.classes:
-            if self.classes[class_item] == cls or cls is None:
-                for key in self.__session.query(self.classes[class_item]).all():
-                    objs[f"{key.__class__.__name__}.{key.id}"] = key
-        return objs
+        dictionary = {}
+        if cls is None:
+            classes_list = (User, State, City, Amenity, Place, Review)
+            for _cls in classes_list:
+                query = self.__session.query(_cls)
+                for obj in query:
+                    dictionary[f"{type(obj).__name__}.{obj.id}"] = obj
+        else:
+            if cls not in HBNBCommand.classes:
+                return {}
+            cls_obj = getattr(models, cls)
+            query = self.__session.query(cls_obj)
+            for obj in query:
+                dictionary[f"{type(obj).__name__}.{obj.id}"] = obj
+        return dictionary
+
+        # for class_item in self.classes:
+        #     if self.classes[class_item] == cls or cls is None:
+        #         for key in self.__session.query(self.classes[class_item]).all():
+        #             objs[f"{key.__class__.__name__}.{key.id}"] = key
+        # return objs
 
     def new(self, obj):
         self.__session.add(obj)
