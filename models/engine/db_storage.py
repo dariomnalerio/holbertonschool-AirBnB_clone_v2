@@ -18,9 +18,9 @@ class DBStorage():
     __session = None
 
     classes = {
-    'User': User, 'Place': Place,
-    'State': State, 'City': City, 'Amenity': Amenity,
-    'Review': Review
+        'User': User, 'Place': Place,
+        'State': State, 'City': City, 'Amenity': Amenity,
+        'Review': Review
     }
 
     def __init__(self):
@@ -44,15 +44,10 @@ class DBStorage():
                     dictionary[obj.__class__.__name__ + '.' + obj.id] = obj
         else:
             class_name = cls.__name__
-            for obj in self.__session.query(DBStorage.classes[class_name]).all():
+            for obj in self.__session.query(DBStorage.classes[class_name]) \
+                    .all():
                 dictionary[obj.__class__.__name__ + '.' + obj.id] = obj
         return dictionary
-
-        # for class_item in self.classes:
-        #     if self.classes[class_item] == cls or cls is None:
-        #         for key in self.__session.query(self.classes[class_item]).all():
-        #             objs[f"{key.__class__.__name__}.{key.id}"] = key
-        # return objs
 
     def new(self, obj):
         self.__session.add(obj)
