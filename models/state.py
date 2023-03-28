@@ -8,19 +8,24 @@ from os import getenv
 
 
 class State(BaseModel, Base):
-
-    name = Column(String(128), nullable=False)
+    """ State class """
     __tablename__ = "states"
+    name = Column(String(128), nullable=False)
+    cities = relationship("City", backref="state", cascade="delete")
 
-    if getenv("HBNB_TYPE_STORAGE") == "db":
-        cities = relationship("City", backref="state", cascade="delete")
-    else:
-        @property
-        def cities(self):
-            from models.city import City
-            from models import storage
-            cities_list = []
-            for item in storage.all(City):
-                if storage.all(City)[item].state_id == self.id:
-                    cities_list.append(storage.all(City)[item])
-            return cities_list
+    @property
+    def cities(self, id):
+        """ Get all cities of the db which are in the state """
+        from models import storage
+
+        storageType = os.environ.get("HBNB_TYPE_STORAGE")
+        if storageType == "db":
+            return self.cities
+
+        elif storageType == "file":
+            res = []
+            objs = storage.all()
+            for id, obj in objs.items():
+                if type(obj) is City and obj.state_id == id:
+                    res.append(obj)
+            return res

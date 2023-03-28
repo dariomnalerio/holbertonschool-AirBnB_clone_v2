@@ -12,7 +12,6 @@ from models.amenity import Amenity
 from models.review import Review
 
 
-
 class DBStorage():
     """Class method"""
     __engine = None
@@ -40,18 +39,13 @@ class DBStorage():
     def all(self, cls=None):
         dictionary = {}
         if cls is None:
-            classes_list = (User, State, City, Amenity, Place, Review)
-            for _cls in classes_list:
-                query = self.__session.query(_cls)
-                for obj in query:
-                    dictionary[f"{type(obj).__name__}.{obj.id}"] = obj
+            for class_value in DBStorage.classes.values():
+                for obj in self.__session.query(class_value).all():
+                    dictionary[obj.__class__.__name__ + '.' + obj.id] = obj
         else:
-            if cls not in self.classes:
-                return {}
-            cls_obj = getattr(models, cls)
-            query = self.__session.query(cls_obj)
-            for obj in query:
-                dictionary[f"{type(obj).__name__}.{obj.id}"] = obj
+            class_name = cls.__name__
+            for obj in self.__session.query(DBStorage.classes[class_name]).all():
+                dictionary[obj.__class__.__name__ + '.' + obj.id] = obj
         return dictionary
 
         # for class_item in self.classes:
