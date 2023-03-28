@@ -10,13 +10,15 @@ app = Flask(__name__)
 
 
 @app.teardown_appcontext
-def teardown():
+def teardown_db():
     storage.close()
 
-@app.route("/states_list", strict_slashes=False)
-def c_text(text):
-    return render_template('7-states_list.html', states_list = states_list)
 
+@app.route("/states_list", strict_slashes=False)
+def states_list():
+    states = storage.all(states).values()
+    states_sorted = sorted(states, key=lambda state: state.name)
+    return render_template('7-states_list.html', states=states_sorted)
 
 
 if __name__ == '__main__':
