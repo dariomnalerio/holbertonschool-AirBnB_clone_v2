@@ -46,7 +46,7 @@ class DBStorage():
                 for obj in query:
                     dictionary[f"{type(obj).__name__}.{obj.id}"] = obj
         else:
-            if cls not in HBNBCommand.classes:
+            if cls not in self.classes:
                 return {}
             cls_obj = getattr(models, cls)
             query = self.__session.query(cls_obj)
@@ -77,3 +77,6 @@ class DBStorage():
                                        expire_on_commit=False)
         Session = scoped_session(session_factory)
         self.__session = Session()
+
+    def close(self):
+        self.__session.close()
